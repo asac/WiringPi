@@ -28,11 +28,13 @@ endif
 
 #DEBUG	= -g -O0
 DEBUG	= -O3
-CC	= gcc
+CC	?= gcc
 INCLUDE	= -I/usr/local/include
 CFLAGS	= $(DEBUG) -Wall $(INCLUDE) -Winline -pipe
+DESTDIR?=/usr
+PREFIX?=/local
 
-LDFLAGS	= -L/usr/local/lib
+LDFLAGS	= -L$(DESTDIR)$(PREFIX)/lib
 LDLIBS    = -lwiringPi -lwiringPiDev -lpthread -lm -lcrypt -lrt
 
 # Should not alter anything below this line

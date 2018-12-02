@@ -1,4 +1,4 @@
-#
+
 # Makefile:
 #	wiringPi device - A "wiring" library for the Raspberry Pi
 #
@@ -36,10 +36,10 @@ DYNAMIC=libwiringPiDev.so.$(VERSION)
 
 #DEBUG	= -g -O0
 DEBUG	= -O2
-CC	= gcc
-INCLUDE	= -I.
+CC	?= gcc
+INCLUDE	= -I. -I$(DESTDIR)$(PREFIX)/include
 DEFS	= -D_GNU_SOURCE
-CFLAGS	= $(DEBUG) $(DEFS) -Wformat=2 -Wall -Winline $(INCLUDE) -pipe -fPIC
+CFLAGS	= $(DEBUG) $(DEFS) -Wformat=2 -Wall -Winline $(INCLUDE) -pipe -fPIC $(EXTRA_CFLAGS)
 
 LIBS    =
 
@@ -68,10 +68,9 @@ $(STATIC):	$(OBJ)
 
 $(DYNAMIC):	$(OBJ)
 	$Q echo "[Link (Dynamic)]"
-	$Q $(CC) -shared -Wl,-soname,libwiringPiDev.so$(WIRINGPI_SONAME_SUFFIX) -o libwiringPiDev.so.$(VERSION) -lpthread $(OBJ)
+	$Q $(CC) -shared -Wl,-soname,libwiringPiDev.so$(WIRINGPI_SONAME_SUFFIX) -L$(DESTDIR)$(PREFIX)/lib -o libwiringPiDev.so.$(VERSION) -lpthread $(OBJ)
 
-.c.o:
-	$Q echo [Compile] $<
+.c.o: $Q echo [Compile] $<
 	$Q $(CC) -c $(CFLAGS) $< -o $@
 
 .PHONY:	clean
@@ -93,7 +92,7 @@ install:	$(DYNAMIC)
 	$Q echo "[Install Dynamic Lib]"
 	$Q install -m 0755 -d						$(DESTDIR)$(PREFIX)/lib
 	$Q install -m 0755 libwiringPiDev.so.$(VERSION)			$(DESTDIR)$(PREFIX)/lib/libwiringPiDev.so.$(VERSION)
-	$Q ln -sf $(DESTDIR)$(PREFIX)/lib/libwiringPiDev.so.$(VERSION)	$(DESTDIR)/lib/libwiringPiDev.so
+	$Q ln -sf $(DESTDIR)$(PREFIX)/lib/libwiringPiDev.so.$(VERSION)	$(DESTDIR)$(PREFIX)/lib/libwiringPiDev.so
 	$Q $(LDCONFIG)
 
 .PHONY:	install-static
